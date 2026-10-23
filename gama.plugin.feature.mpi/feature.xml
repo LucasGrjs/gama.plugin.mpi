@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="gama.plugin.feature.mpi"
+      label="MPI"
+      version="1.0.0.qualifier"
+      provider-name="GAMA Platform">
+
+   <description url="https://gama-platform.org">
+      MPI skill and experiment type to run GAMA simulations distributed over several processes (Open MPI Java bindings).
+   </description>
+
+   <copyright url="https://gama-platform.org">
+      [Enter copyright here.]
+   </copyright>
+
+   <license url="https://gama-platform.org/license">
+      [Enter license here.]
+   </license>
+
+   <plugin
+         id="gama.plugin.mpi"
+         version="0.0.0"/>
+
+</feature>
