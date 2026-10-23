@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Experiment_plan>
+  <Simulation id="0" sourcePath="mpi_alltoall.gaml" experiment="mpi_alltoall" finalStep="1">
+  </Simulation>
+</Experiment_plan>

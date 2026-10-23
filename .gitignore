@@ -1,2 +1,4 @@
 **/target/
 **/bin/
+# snapshots written by the mpi_monte_carlo_pi example
+**/models/MPI Examples/models/checkpoints/

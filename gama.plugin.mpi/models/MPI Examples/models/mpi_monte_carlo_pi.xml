@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Run from start. To resume after an interruption, set "Resume from the last snapshot" to true.
+     The snapshot folder is relative to the model file unless absolute.
+     The "pi" display is saved by each rank in <output dir>/rank_<r>/snapshot/:
+     python3 mpi_display.py <output dir> pi   makes a GIF of it. -->
+<Experiment_plan>
+  <Simulation id="0" sourcePath="mpi_monte_carlo_pi.gaml" experiment="mpi_monte_carlo_pi" finalStep="25">
+    <Parameters>
+      <Parameter name="Snapshot folder" var="checkpoint_dir" type="STRING" value="checkpoints"/>
+      <Parameter name="Snapshot every (cycles)" var="checkpoint_every" type="INT" value="5"/>
+      <Parameter name="Resume from the last snapshot" var="resume" type="BOOLEAN" value="false"/>
+    </Parameters>
+    <Outputs>
+      <Output id="1" name="pi" framerate="1" width="630" height="360"/>
+    </Outputs>
+  </Simulation>
+</Experiment_plan>
