@@ -1,6 +1,8 @@
 
 package pluginActivator;
 
+import MPISkill.MPIDebug;
+
 import java.io.FileNotFoundException;
 
 import org.osgi.framework.BundleActivator;
@@ -30,15 +32,16 @@ public class MPIActivator implements BundleActivator {
 			String[] args = {};
 			MPI.InitThread(args, MPI.THREAD_MULTIPLE);
 			
-			DEBUG.OUT("isInServerMode : " +  GAMA.isInServerMode());
-			DEBUG.OUT("isInHeadLessMode : " + GAMA.isInHeadLessMode());
+			MPIDebug.out("isInServerMode : " +  GAMA.isInServerMode());
+			MPIDebug.out("isInHeadLessMode : " + GAMA.isInHeadLessMode());
 			
-			Globals.OUTPUT_PATH = "output.log";
-			DEBUG.OUT("MPI.COMM_WORLD.getRank() " + MPI.COMM_WORLD.getRank());
+			// keep the output directory given to headless GAMA; "output.log" only when none was given
+			if (Globals.OUTPUT_PATH == null) { Globals.OUTPUT_PATH = "output.log"; }
+			MPIDebug.out("MPI.COMM_WORLD.getRank() " + MPI.COMM_WORLD.getRank());
 			
 			DEBUG.REGISTER_LOG_WRITER(new IExperimentJob.DebugStream(MPI.COMM_WORLD.getRank()));
 			
-			DEBUG.LOG("************* MPI Init : " + MPI.COMM_WORLD.getRank());
+			MPIDebug.out("************* MPI Init : " + MPI.COMM_WORLD.getRank());
 		} catch (FileNotFoundException | MPIException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,10 +52,10 @@ public class MPIActivator implements BundleActivator {
 	public void stop(final BundleContext context) throws Exception
 	{
 		try {
-	    	DEBUG.OUT("************* MPI Finalize");
+	    	MPIDebug.out("************* MPI Finalize");
 			MPI.Finalize();
 	    } catch (final MPIException e) {
-	    	DEBUG.OUT("MPI Finalize Error" + e);
+	    	MPIDebug.err("MPI Finalize Error" + e);
 	    }
 	}
 

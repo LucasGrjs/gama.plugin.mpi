@@ -1,5 +1,7 @@
 package mpiExperiment;
 
+import MPISkill.MPIDebug;
+
 import java.io.FileNotFoundException;
 
 import MPISkill.MPIFunctions;
@@ -34,7 +36,7 @@ public class MPIExperiment extends ExperimentAgent
 	@Override
 	public void dispose() 
 	{
-    	DEBUG.OUT("************* disposing MPIExperiment");
+    	MPIDebug.out("************* disposing MPIExperiment");
 		super.dispose();
 		MPIFunctions.MPI_FINALIZE();
 		DEBUG.UNREGISTER_LOG_WRITER();
@@ -49,7 +51,8 @@ public class MPIExperiment extends ExperimentAgent
 	
 	private void setOuputForDistributedExperiment()
 	{
-		Globals.OUTPUT_PATH = "output.log"; // directory in which all logs will be written 
+		// directory in which all logs are written: the one given to headless GAMA, else "output.log"
+		if (Globals.OUTPUT_PATH == null) { Globals.OUTPUT_PATH = "output.log"; }
 		try {
 			DEBUG.REGISTER_LOG_WRITER(new IExperimentJob.DebugStream(MPI.COMM_WORLD.getRank()));
 			
