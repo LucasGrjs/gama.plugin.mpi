@@ -800,13 +800,17 @@ public class MPIFunctions
         return displs;
     }
 
+	/** True once an MPI_EXP experiment has been created: it then finalizes MPI itself when disposed. */
+	public static volatile boolean MPI_EXPERIMENT_STARTED = false;
+
     /**
-     * Finalizes the MPI environment
+     * Finalizes the MPI environment, if it is initialized and not finalized yet.
      * Should be called at end of MPI usage
      */
 	public static void MPI_FINALIZE()
 	{
 		try {
+			if (!MPI.isInitialized() || MPI.isFinalized()) { return; }
 	    	MPIDebug.out("************* MPI Finalize");
 			MPI.Finalize();
 	    } catch (final MPIException e) {

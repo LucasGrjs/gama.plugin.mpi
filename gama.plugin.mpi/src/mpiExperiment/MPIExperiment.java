@@ -29,6 +29,7 @@ public class MPIExperiment extends ExperimentAgent
 	public MPIExperiment(IPopulation<? extends IAgent> s, int index) throws GamaRuntimeException 
 	{
 		super(s, index);
+		MPIFunctions.MPI_EXPERIMENT_STARTED = true;
 		MPIFunctions.MPI_INIT_MULTIPLE_THREAD();
 		setOuputForDistributedExperiment();   
 	}

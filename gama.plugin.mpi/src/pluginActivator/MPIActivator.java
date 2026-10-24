@@ -2,6 +2,7 @@
 package pluginActivator;
 
 import MPISkill.MPIDebug;
+import MPISkill.MPIFunctions;
 
 import java.io.FileNotFoundException;
 
@@ -42,6 +43,14 @@ public class MPIActivator implements BundleActivator {
 			DEBUG.REGISTER_LOG_WRITER(new IExperimentJob.DebugStream(MPI.COMM_WORLD.getRank()));
 			
 			MPIDebug.out("************* MPI Init : " + MPI.COMM_WORLD.getRank());
+
+			// MPI is started here for every run, but only an MPI_EXP experiment ends it. When the run had none
+			// (e.g. a centralised experiment started by mpirun), end MPI as the JVM exits, or mpirun reports an
+			// abnormal termination. Not done after an MPI_EXP run that failed: MPI_Finalize could then wait
+			// for the other ranks.
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				if (!MPIFunctions.MPI_EXPERIMENT_STARTED) { MPIFunctions.MPI_FINALIZE(); }
+			}, "MPI finalize at exit"));
 		} catch (FileNotFoundException | MPIException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,12 +60,7 @@ public class MPIActivator implements BundleActivator {
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
-		try {
-	    	MPIDebug.out("************* MPI Finalize");
-			MPI.Finalize();
-	    } catch (final MPIException e) {
-	    	MPIDebug.err("MPI Finalize Error" + e);
-	    }
+		MPIFunctions.MPI_FINALIZE();
 	}
 
 }
