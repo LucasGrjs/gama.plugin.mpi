@@ -96,9 +96,9 @@ public class MPISkill extends Skill
 		final int dest = ((Integer) scope.getArg(IMPISkill.DEST, IType.INT)).intValue();
 		final int stag = ((Integer) scope.getArg(IMPISkill.STAG, IType.INT)).intValue();
 
-		MPIDebug.out("mesg = " + mesg);
-		MPIDebug.out("dest = " + dest);
-		MPIDebug.out("stag = " + stag);
+		if (MPIDebug.ON) MPIDebug.out("mesg = " + mesg);
+		if (MPIDebug.ON) MPIDebug.out("dest = " + dest);
+		if (MPIDebug.ON) MPIDebug.out("stag = " + stag);
 		MPIFunctions.MPI_SEND(scope, mesg, dest, stag);
 	}
 	
@@ -126,9 +126,9 @@ public class MPISkill extends Skill
 		final Object mesg = scope.getArg(IMPISkill.MESG, IType.NONE);
 		final int dest = ((Integer) scope.getArg(IMPISkill.DEST, IType.INT)).intValue();
 		final int stag = ((Integer) scope.getArg(IMPISkill.STAG, IType.INT)).intValue();
-		MPIDebug.out("mesg = " + mesg);
-		MPIDebug.out("dest = " + dest);
-		MPIDebug.out("stag = " + stag);
+		if (MPIDebug.ON) MPIDebug.out("mesg = " + mesg);
+		if (MPIDebug.ON) MPIDebug.out("dest = " + dest);
+		if (MPIDebug.ON) MPIDebug.out("stag = " + stag);
 		
 		MPIFunctions.MPI_ISEND(scope, mesg, dest, stag);
 	}
@@ -153,8 +153,8 @@ public class MPISkill extends Skill
 		int source = (scope.hasArg(IMPISkill.SOURCE)) ? (Integer) scope.getArg(IMPISkill.SOURCE, IType.INT) : MPI.ANY_SOURCE;
 	    int tag = (scope.hasArg(IMPISkill.RTAG)) ? (Integer) scope.getArg(IMPISkill.RTAG, IType.INT) : MPI.ANY_TAG;
 
-		MPIDebug.out("source = " + source);
-		MPIDebug.out("rtag = " + tag);
+		if (MPIDebug.ON) MPIDebug.out("source = " + source);
+		if (MPIDebug.ON) MPIDebug.out("rtag = " + tag);
 		return MPIFunctions.MPI_RECV(scope, source, tag);
 	}
 	
@@ -178,8 +178,8 @@ public class MPISkill extends Skill
 	    int source = (scope.hasArg(IMPISkill.SOURCE)) ? (Integer) scope.getArg(IMPISkill.SOURCE, IType.INT) : MPI.ANY_SOURCE;
 	    int tag = (scope.hasArg(IMPISkill.RTAG)) ? (Integer) scope.getArg(IMPISkill.RTAG, IType.INT) : MPI.ANY_TAG;
 
-	    MPIDebug.out("source = " + source);
-	    MPIDebug.out("rtag = " + tag);
+	    if (MPIDebug.ON) MPIDebug.out("source = " + source);
+	    if (MPIDebug.ON) MPIDebug.out("rtag = " + tag);
 
 	    return MPIFunctions.MPI_IRECV(scope, source, tag);
 	}
@@ -287,7 +287,7 @@ public class MPISkill extends Skill
 	public IMap<Integer, IList<?>> mpi_alltoall(final IScope scope)
 	{
 		final IMap<Integer, List<?>> mesg = (IMap<Integer,  List<?>>) scope.getArg(IMPISkill.MESG, IType.MAP);
-		MPIDebug.out("imap ALLTOALL : " + mesg);
+		if (MPIDebug.ON) MPIDebug.out("imap ALLTOALL : " + mesg);
 		return MPIFunctions.MPI_ALLTOALLV(scope, mesg);
 	}
 
@@ -363,11 +363,11 @@ public class MPISkill extends Skill
 	public void doBarrier(final IScope scope) {
 		try
 		{
-			MPIDebug.out("MPI BARRIER WAITING = "+ MPI.COMM_WORLD.getRank());
+			if (MPIDebug.ON) MPIDebug.out("MPI BARRIER WAITING = "+ MPI.COMM_WORLD.getRank());
 			final long t0 = System.nanoTime();
 			MPI.COMM_WORLD.barrier();
 			MPIFunctions.BARRIER_WAIT_NANOS.addAndGet(System.nanoTime() - t0);
-			MPIDebug.out("MPI BARRIER END = "+ MPI.COMM_WORLD.getRank());
+			if (MPIDebug.ON) MPIDebug.out("MPI BARRIER END = "+ MPI.COMM_WORLD.getRank());
 		} catch (final MPIException mpiex) 
 		{
 			MPIDebug.err("MPI barrier Error" + mpiex);
@@ -421,10 +421,10 @@ public class MPISkill extends Skill
 	{
 		final IList mesg = (IList) scope.getArg(IMPISkill.MESG, IType.LIST);
 		String conversion = SerialisationOperators.serialize(scope, mesg);
-		MPIDebug.out("conversion : " + conversion);
+		if (MPIDebug.ON) MPIDebug.out("conversion : " + conversion);
 		
 		final IList rcvMesg = (IList) SerialisationOperators.unserialize(scope, conversion);
-		MPIDebug.out("rcvMesg "+rcvMesg);
+		if (MPIDebug.ON) MPIDebug.out("rcvMesg "+rcvMesg);
 		
 		return rcvMesg;
 	}

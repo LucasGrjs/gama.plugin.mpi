@@ -57,7 +57,7 @@ public class MPIFunctions
 		final byte[] message = conversion.getBytes();
 		byte type = message[0];
 
-		MPIDebug.out("sending object type : " + type);
+		if (MPIDebug.ON) MPIDebug.out("sending object type : " + type);
 		
 		try {
 			MPI.COMM_WORLD.send(message, message.length, MPI.BYTE, dest, tag);
@@ -76,19 +76,19 @@ public class MPIFunctions
      */
 	public static void MPI_ISEND(IScope scope, Object msg, int dest, int tag)
 	{
-		MPIDebug.out("MPI_ISEND to ["+dest+"] : " + msg + " tag " + tag);
+		if (MPIDebug.ON) MPIDebug.out("MPI_ISEND to ["+dest+"] : " + msg + " tag " + tag);
 		String conversion = BinarySerialisation.saveToString(scope, msg);
 		final byte[] message = conversion.getBytes();
 		byte type = message[0];
 
-		MPIDebug.out("sending object type : " + type);
+		if (MPIDebug.ON) MPIDebug.out("sending object type : " + type);
 
 		ByteBuffer buffer = MPI.newByteBuffer(message.length);
         buffer.put(message);
 
-		MPIDebug.out("buffer capacity: " + buffer.capacity());
-		MPIDebug.out("buffer remaining: " + buffer.remaining());
-		MPIDebug.out("buffer limit: " + buffer.limit());
+		if (MPIDebug.ON) MPIDebug.out("buffer capacity: " + buffer.capacity());
+		if (MPIDebug.ON) MPIDebug.out("buffer remaining: " + buffer.remaining());
+		if (MPIDebug.ON) MPIDebug.out("buffer limit: " + buffer.limit());
 		
 		try {
 			Request req = MPI.COMM_WORLD.iSend(buffer, buffer.capacity(), MPI.BYTE, dest, tag);
@@ -110,15 +110,15 @@ public class MPIFunctions
 	public static Object MPI_RECV(IScope scope, int source, int tag)
 	{
 		try {
-			MPIDebug.out("proibing ["+source+"] " + tag);
+			if (MPIDebug.ON) MPIDebug.out("proibing ["+source+"] " + tag);
 			Status st = MPI.COMM_WORLD.probe(source, tag);
 	        int sizeOfMessage = st.getCount(MPI.BYTE);
-			MPIDebug.out("sizeOfMessage : " + sizeOfMessage);
+			if (MPIDebug.ON) MPIDebug.out("sizeOfMessage : " + sizeOfMessage);
 	        byte[] message = new byte[sizeOfMessage];
 			MPI.COMM_WORLD.recv(message, sizeOfMessage, MPI.BYTE, source, tag);
-			MPIDebug.out("received size : " + message.length);
+			if (MPIDebug.ON) MPIDebug.out("received size : " + message.length);
 			byte type = message[0];
-			MPIDebug.out("object type in receive : " + type);
+			if (MPIDebug.ON) MPIDebug.out("object type in receive : " + type);
 			Object recv = (Object) BinarySerialisation.createFromString(scope, new String(message));
 			return recv;
 		} catch (Exception e) 
@@ -139,7 +139,7 @@ public class MPIFunctions
 	public static Object MPI_IRECV(IScope scope, int source, int tag) 
 	{
 	    try {
-	        MPIDebug.out("Starting IRECV from ["+source+"] with tag " + tag);
+	        if (MPIDebug.ON) MPIDebug.out("Starting IRECV from ["+source+"] with tag " + tag);
 	        Status st = MPI.COMM_WORLD.iProbe(source, tag);
 	        if (st != null) {
 	            int sizeOfMessage = st.getCount(MPI.BYTE);
@@ -302,9 +302,9 @@ public class MPIFunctions
             int my_rank = MPI.COMM_WORLD.getRank();
             int world_size = MPI.COMM_WORLD.getSize();
 
-            MPIDebug.out("ROOT IS " + root);
-            MPIDebug.out("I'm " + my_rank);
-            MPIDebug.out("msg " + msg);
+            if (MPIDebug.ON) MPIDebug.out("ROOT IS " + root);
+            if (MPIDebug.ON) MPIDebug.out("I'm " + my_rank);
+            if (MPIDebug.ON) MPIDebug.out("msg " + msg);
             if (my_rank == root) {
                 // Prepare send counts and data
                 int[] sendcounts = new int[world_size];
@@ -350,7 +350,7 @@ public class MPIFunctions
                 // First scatter operation: receive the size of our chunk
                 MPI.COMM_WORLD.scatter(null, 0, MPI.INT,
                                      recvcount, 1, MPI.INT, root);
-                MPIDebug.out("received " + recvcount[0]);
+                if (MPIDebug.ON) MPIDebug.out("received " + recvcount[0]);
                 
                 // Now we know how much data we'll receive
                 byte[] recvbuf = new byte[recvcount[0]];
@@ -363,7 +363,7 @@ public class MPIFunctions
                 
                 IList<?> received = (IList<?>) BinarySerialisation.createFromString(scope, new String(recvbuf, ISerialisationConstants.STRING_BYTE_ARRAY_CHARSET));
 
-                MPIDebug.out("received " + received);
+                if (MPIDebug.ON) MPIDebug.out("received " + received);
                 // Deserialize our received chunk back into a GAMA list
                 return received;
             }
@@ -451,19 +451,19 @@ public class MPIFunctions
 		{
 			int my_rank = MPI.COMM_WORLD.getRank();
 	        int world_size = MPI.COMM_WORLD.getSize(); 
-	        MPIDebug.out("my_rank " + my_rank);
-	        MPIDebug.out("world_size " + world_size);
+	        if (MPIDebug.ON) MPIDebug.out("my_rank " + my_rank);
+	        if (MPIDebug.ON) MPIDebug.out("world_size " + world_size);
 	        byte buffSend[] = new byte[size * world_size];			// buffer to send data
 	        byte bufferReceive[] = new byte[size * world_size]; 	// buffer to receive data
-	        MPIDebug.out("size of buffer " + size * world_size);
+	        if (MPIDebug.ON) MPIDebug.out("size of buffer " + size * world_size);
 	        Arrays.fill(buffSend, (byte) my_rank);
 	        MPIDebug.out("buffSend filled ");
-	        MPIDebug.out("buffSend[0] " + buffSend[0]);
-	        MPIDebug.out("buffSend[0] " + buffSend[(size * world_size) - 1]);
+	        if (MPIDebug.ON) MPIDebug.out("buffSend[0] " + buffSend[0]);
+	        if (MPIDebug.ON) MPIDebug.out("buffSend[0] " + buffSend[(size * world_size) - 1]);
 			MPI.COMM_WORLD.allToAll(buffSend, size, MPI.BYTE, bufferReceive, size, MPI.BYTE);
-	        MPIDebug.out("bufferReceive received " + bufferReceive[0]);
-	        MPIDebug.out("bufferReceive received -1 " + bufferReceive[(size * world_size) - 1]);
-	        MPIDebug.out("bufferReceive.toString() " + bufferReceive.toString());
+	        if (MPIDebug.ON) MPIDebug.out("bufferReceive received " + bufferReceive[0]);
+	        if (MPIDebug.ON) MPIDebug.out("bufferReceive received -1 " + bufferReceive[(size * world_size) - 1]);
+	        if (MPIDebug.ON) MPIDebug.out("bufferReceive.toString() " + bufferReceive.toString());
 	        MPIDebug.out(Arrays.toString(bufferReceive));
 		} catch (Exception e) 
 		{
@@ -482,14 +482,14 @@ public class MPIFunctions
      */
 	public static IMap<Integer, IList<?>> MPI_ALLTOALLV_test(IScope scope, int size)
 	{
-		MPIDebug.out("MPI_ALLTOALLV_test " + size);
+		if (MPIDebug.ON) MPIDebug.out("MPI_ALLTOALLV_test " + size);
 		int my_rank;
 		try {
 			my_rank = MPI.COMM_WORLD.getRank();
 	        int world_size = MPI.COMM_WORLD.getSize(); // number of process in comm
-	        MPIDebug.out("my_rank : " + my_rank);
-	        MPIDebug.out("world_size : " + world_size);
-	        MPIDebug.out("msg number of elem  : " + size);
+	        if (MPIDebug.ON) MPIDebug.out("my_rank : " + my_rank);
+	        if (MPIDebug.ON) MPIDebug.out("world_size : " + world_size);
+	        if (MPIDebug.ON) MPIDebug.out("msg number of elem  : " + size);
 	        int bufferReceiveSize[] = new int[world_size]; // buffer to receive size of incoming buffer in allToAllv
 	        int buffSendSize[] = new int[world_size]; // buffer to send size of incoming buffer to all
 	        List<byte[]> serializedMessage = new ArrayList<byte[]>();
@@ -506,35 +506,35 @@ public class MPIFunctions
 	            System.arraycopy(byteArray, 0, finalMessage, offset, byteArray.length);
 	            offset += byteArray.length;
 	        }
-			MPIDebug.out("finalMessage lenght : "  +finalMessage.length);
+			if (MPIDebug.ON) MPIDebug.out("finalMessage lenght : "  +finalMessage.length);
 	        int displsSend[] = computeDispl(world_size, buffSendSize); // displs of send buffer
 			MPIDebug.out("computeDispl displsSend ");
 			for(var auto : buffSendSize)
 	        {
-	        	MPIDebug.out("buffSendSize " + auto);
+	        	if (MPIDebug.ON) MPIDebug.out("buffSendSize " + auto);
 	        }
 			for(var auto : bufferReceiveSize)
 	        {
-	        	MPIDebug.out("bufferReceiveSize " + auto);
+	        	if (MPIDebug.ON) MPIDebug.out("bufferReceiveSize " + auto);
 	        }
 			MPIDebug.out("1st all to all ");
 	        MPI.COMM_WORLD.allToAll(buffSendSize, 1, MPI.INT, bufferReceiveSize, 1, MPI.INT); // send to all + receive from all size of incoming buffer
-			MPIDebug.out("bufferReceiveSize received : " + bufferReceiveSize.length);
+			if (MPIDebug.ON) MPIDebug.out("bufferReceiveSize received : " + bufferReceiveSize.length);
 	        int displsReceive[] = computeDispl(world_size, bufferReceiveSize); // displs of receive buffer*/
 			MPIDebug.out("computeDispl displsReceive ");
 	        byte bufferReceiveData[] = new byte[Arrays.stream(bufferReceiveSize).sum()]; // buffer to receive data
 	        for(var auto : displsSend)
 	        {
-	        	MPIDebug.out("displsSend " + auto);
+	        	if (MPIDebug.ON) MPIDebug.out("displsSend " + auto);
 	        }
 	        for(var auto : displsReceive)
 	        {
-	        	MPIDebug.out("displsReceive " + auto);
+	        	if (MPIDebug.ON) MPIDebug.out("displsReceive " + auto);
 	        }
 			MPIDebug.out("bufferReceiveData");
 	        MPI.COMM_WORLD.allToAllv(finalMessage, buffSendSize, displsSend, MPI.BYTE, bufferReceiveData, bufferReceiveSize, displsReceive, MPI.BYTE); // send to all + receive from all with different size
 			MPIDebug.out("post allToAllv");
-	        MPIDebug.out("received : " + bufferReceiveData.length+ " elements");
+	        if (MPIDebug.ON) MPIDebug.out("received : " + bufferReceiveData.length+ " elements");
 		} catch (Exception e) {
 			MPIDebug.err("MPI_ALLTOALLV exception " + e);
 			e.printStackTrace();
@@ -563,22 +563,22 @@ public class MPIFunctions
 	/** Same as MPI_ALLTOALLV(scope, msg); the time of the exchange is added to commNanos. */
 	public static IMap<Integer, IList<?>> MPI_ALLTOALLV(IScope scope, IMap<Integer, List<?>> msg, AtomicLong commNanos)
 	{
-		MPIDebug.out("MPI_ALLTOALLV " + msg);
+		if (MPIDebug.ON) MPIDebug.out("MPI_ALLTOALLV " + msg);
 		int my_rank;
 		try {
 			my_rank = MPI.COMM_WORLD.getRank();
 	        int world_size = MPI.COMM_WORLD.getSize(); // number of process in comm
-	        MPIDebug.out("my_rank : " + my_rank);
-	        MPIDebug.out("world_size : " + world_size);
-	        MPIDebug.out("msg number of elem  : " + msg.length(scope));
-	        MPIDebug.out("msg size  : " + msg.size());
-	        MPIDebug.out("msg.entrySet() : " + msg.entrySet());
+	        if (MPIDebug.ON) MPIDebug.out("my_rank : " + my_rank);
+	        if (MPIDebug.ON) MPIDebug.out("world_size : " + world_size);
+	        if (MPIDebug.ON) MPIDebug.out("msg number of elem  : " + msg.length(scope));
+	        if (MPIDebug.ON) MPIDebug.out("msg size  : " + msg.size());
+	        if (MPIDebug.ON) MPIDebug.out("msg.entrySet() : " + msg.entrySet());
 	        for(var auto : msg.entrySet())
 			{
-	        	MPIDebug.out("rank : " + auto.getKey());
+	        	if (MPIDebug.ON) MPIDebug.out("rank : " + auto.getKey());
 				for(var copyAgent : auto.getValue())
 				{
-					MPIDebug.out("agent to send : " + copyAgent);
+					if (MPIDebug.ON) MPIDebug.out("agent to send : " + copyAgent);
 				}
 			}
 	        int bufferReceiveSize[] = new int[world_size]; // buffer to receive size of incoming buffer in allToAllv
@@ -606,53 +606,53 @@ public class MPIFunctions
 	            System.arraycopy(byteArray, 0, finalMessage, offset, byteArray.length);
 	            offset += byteArray.length;
 	        }
-			MPIDebug.out("finalMessage lenght : " +finalMessage.length);
+			if (MPIDebug.ON) MPIDebug.out("finalMessage lenght : " +finalMessage.length);
 	        int displsSend[] = computeDispl(world_size, buffSendSize); // displs of send buffer
 			MPIDebug.out("computeDispl displsSend ");
 			for(var auto : buffSendSize)
 	        {
-	        	MPIDebug.out("buffSendSize " + auto);
+	        	if (MPIDebug.ON) MPIDebug.out("buffSendSize " + auto);
 	        }
 			for(var auto : bufferReceiveSize)
 	        {
-	        	MPIDebug.out("bufferReceiveSize " + auto);
+	        	if (MPIDebug.ON) MPIDebug.out("bufferReceiveSize " + auto);
 	        }
 			MPIDebug.out("1st all to all ");
 	        MPI.COMM_WORLD.allToAll(buffSendSize, 1, MPI.INT, bufferReceiveSize, 1, MPI.INT); // send to all + receive from all size of incoming buffer
-			MPIDebug.out("bufferReceiveSize received : " + bufferReceiveSize.length);
+			if (MPIDebug.ON) MPIDebug.out("bufferReceiveSize received : " + bufferReceiveSize.length);
 	        int displsReceive[] = computeDispl(world_size, bufferReceiveSize); // displs of receive buffer*/
 			MPIDebug.out("computeDispl displsReceive ");
 	        byte bufferReceiveData[] = new byte[Arrays.stream(bufferReceiveSize).sum()]; // buffer to receive data
 	        for(var auto : displsSend)
 	        {
-	        	MPIDebug.out("displsSend " + auto);
+	        	if (MPIDebug.ON) MPIDebug.out("displsSend " + auto);
 	        }
 	        for(var auto : displsReceive)
 	        {
-	        	MPIDebug.out("displsReceive " + auto);
+	        	if (MPIDebug.ON) MPIDebug.out("displsReceive " + auto);
 	        }
-			MPIDebug.out("finalMessage size : " + finalMessage + " bytes");
+			if (MPIDebug.ON) MPIDebug.out("finalMessage size : " + finalMessage + " bytes");
 	        final long tc = System.nanoTime();
 	        allToAllvDirect(finalMessage, buffSendSize, displsSend, bufferReceiveData, bufferReceiveSize, displsReceive); // send to all + receive from all with different size
 	        commNanos.addAndGet(System.nanoTime() - tc);
 			MPIDebug.out("post allToAllv");
 	        IMap<Integer, IList<?>> ma = GamaMapFactory.create();
 	        byte b1[];
-			MPIDebug.out("displsReceive.length : " + displsReceive.length);
+			if (MPIDebug.ON) MPIDebug.out("displsReceive.length : " + displsReceive.length);
 	        int subBufferStart;
 	        int subBufferEnd;
 	        for(int index = 0; index < displsReceive.length; index++)
 	        {        
-	        	MPIDebug.out("index " + index);
-	        	MPIDebug.out("displsReceive.length " + displsReceive.length);
+	        	if (MPIDebug.ON) MPIDebug.out("index " + index);
+	        	if (MPIDebug.ON) MPIDebug.out("displsReceive.length " + displsReceive.length);
 	    	    if(index != displsReceive.length-1)
 	            {
-	                MPIDebug.out("start displ["+index+"] from displ " + (displsReceive[index]));
-	                MPIDebug.out("end displ[" + (index+1) +"] " + (displsReceive[index+1]));         
+	                if (MPIDebug.ON) MPIDebug.out("start displ["+index+"] from displ " + (displsReceive[index]));
+	                if (MPIDebug.ON) MPIDebug.out("end displ[" + (index+1) +"] " + (displsReceive[index+1]));
 	                subBufferStart = displsReceive[index];
 	                subBufferEnd = displsReceive[index+1];
-	                MPIDebug.out("subBufferStart [" + displsReceive[index]);
-	                MPIDebug.out("subBufferEnd [" + displsReceive[index+1]);            
+	                if (MPIDebug.ON) MPIDebug.out("subBufferStart [" + displsReceive[index]);
+	                if (MPIDebug.ON) MPIDebug.out("subBufferEnd [" + displsReceive[index+1]);
 	           
 	            }else
 	            {           
@@ -664,17 +664,17 @@ public class MPIFunctions
 	                MPIDebug.out("subBufferStart != subBufferEnd");
 	    	        IList<Object> li = GamaListFactory.create();
 	                MPIDebug.out("li created");
-	                MPIDebug.out("subBufferStart " + subBufferStart);
-	                MPIDebug.out("subBufferEnd " + subBufferEnd);
+	                if (MPIDebug.ON) MPIDebug.out("subBufferStart " + subBufferStart);
+	                if (MPIDebug.ON) MPIDebug.out("subBufferEnd " + subBufferEnd);
 	    			b1 = Arrays.copyOfRange(bufferReceiveData, subBufferStart, subBufferEnd);
-	    			MPIDebug.out("b1 copied " + b1.length);
+	    			if (MPIDebug.ON) MPIDebug.out("b1 copied " + b1.length);
 	    			String byteToString = new String(b1, ISerialisationConstants.STRING_BYTE_ARRAY_CHARSET);
-	    			MPIDebug.out("byteToString created " + b1);
-	    			MPIDebug.out("scope created" + scope);
+	    			if (MPIDebug.ON) MPIDebug.out("byteToString created " + b1);
+	    			if (MPIDebug.ON) MPIDebug.out("scope created" + scope);
 	    			final long td = System.nanoTime();
 	    			Object deserialized = BinarySerialisation.createFromString(scope, byteToString);
 	    			SERIALIZATION_NANOS.addAndGet(System.nanoTime() - td);
-	    			MPIDebug.out("deserialized" + deserialized);
+	    			if (MPIDebug.ON) MPIDebug.out("deserialized" + deserialized);
 	    			if(deserialized instanceof List)
 	    			{	MPIDebug.out("IList<Object>");
 // check si c'est correct de faire ça
@@ -684,11 +684,11 @@ public class MPIFunctions
 		    			li.add(deserialized);
 		    			ma.put(index, li);
 	    			}
-	    			MPIDebug.out("created li : " + li);
-	    			MPIDebug.out("ma.put(index, li); " + ma);
+	    			if (MPIDebug.ON) MPIDebug.out("created li : " + li);
+	    			if (MPIDebug.ON) MPIDebug.out("ma.put(index, li); " + ma);
 	    		}
 			}
-			MPIDebug.out("returning alltoall li : " + ma);
+			if (MPIDebug.ON) MPIDebug.out("returning alltoall li : " + ma);
 			return ma;
 		} catch (Exception e) {
 			MPIDebug.err("MPI_ALLTOALLV exception " + e);
@@ -838,8 +838,8 @@ public class MPIFunctions
 			e.printStackTrace();
 			MPIDebug.out("MPI init failed");
 		}
-		MPIDebug.out("isInServerMode : " +  GAMA.isInServerMode());
-		MPIDebug.out("isInHeadLessMode : " + GAMA.isInHeadLessMode());
+		if (MPIDebug.ON) MPIDebug.out("isInServerMode : " +  GAMA.isInServerMode());
+		if (MPIDebug.ON) MPIDebug.out("isInHeadLessMode : " + GAMA.isInHeadLessMode());
 	}
 
     /**
@@ -862,8 +862,8 @@ public class MPIFunctions
 			e.printStackTrace();
 			MPIDebug.out("MPI init failed");
 		}
-		MPIDebug.out("isInServerMode : " +  GAMA.isInServerMode());
-		MPIDebug.out("isInHeadLessMode : " + GAMA.isInHeadLessMode());
+		if (MPIDebug.ON) MPIDebug.out("isInServerMode : " +  GAMA.isInServerMode());
+		if (MPIDebug.ON) MPIDebug.out("isInHeadLessMode : " + GAMA.isInHeadLessMode());
 	}
 
     /**
